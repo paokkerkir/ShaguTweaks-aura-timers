@@ -4,16 +4,16 @@ Companion addon for [ShaguTweaks](https://github.com/shagu/ShaguTweaks) that sho
 
 ## Requirements
 
-- [ShaguTweaks](https://github.com/shagu/ShaguTweaks) — core framework
-- [SuperWoW](https://github.com/balakethelock/SuperWoW) — aura data and cast event APIs
-- [ShaguTweaks-extras](https://github.com/shagu/ShaguTweaks-extras) (optional) — enables raid frame support
-- [Nampower](https://github.com/pepopo978/namern) (optional) — provides exact duration data from server
+- [ShaguTweaks](https://github.com/shagu/ShaguTweaks) - core framework
+- [SuperWoW](https://github.com/balakethelock/SuperWoW) - aura data and cast event APIs
+- [ShaguTweaks-extras](https://github.com/shagu/ShaguTweaks-extras) (optional) - enables raid frame support
+- [Nampower](https://github.com/pepopo978/namern) (optional) - provides exact duration data from server
 
 ## Installation
 
 Copy `ShaguTweaks-aura-timers/` into `Interface/AddOns/` and `/reload`.
 
-Registers as a ShaguTweaks module — toggle on/off in ShaguTweaks settings.
+Registers as a ShaguTweaks module - toggle on/off in ShaguTweaks settings.
 
 ## How It Works
 
