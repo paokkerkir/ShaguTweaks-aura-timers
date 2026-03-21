@@ -592,11 +592,11 @@ module.enable = function(self)
   HideDefaultTargetAuras()
 
   -- ===========================================================================
-  -- TARGET FRAME: timer text below icons, no row wrapping
+  -- TARGET FRAME: timer inside-bottom, no row wrapping
   -- ===========================================================================
   do
     local targetDisplay = CreateAuraDisplay(TargetFrame, MAX_BUFFS, MAX_DEBUFFS,
-      TARGET_ICON_SIZE, 5, 30, TARGET_TIMER_FONT, "RIGHT", true, nil)
+      TARGET_ICON_SIZE, 5, 30, TARGET_TIMER_FONT, "RIGHT", false, nil)
     table.insert(allDisplays, targetDisplay)
 
     local ev = CreateFrame("Frame")
