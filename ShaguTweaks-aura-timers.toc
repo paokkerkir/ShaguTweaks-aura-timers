@@ -1,9 +1,9 @@
 ## Interface: 11200
 ## Title: |cffffcc00Shagu|cffffffffTweaks |cffcccccc[Aura Timers]
 ## Author: paokkerkir
-## Notes: Show buff and debuff icons with duration timers on target, party, pet, and raid frames. Requires SuperWoW + Nampower.
-## Version: 2.0
+## Notes: Show buff and debuff icons with duration timers on target, party, and pet frames. Requires SuperWoW + Nampower.
+## Version: 3.0
 ## Dependencies: ShaguTweaks
 ## OptionalDeps: ShaguTweaks-extras
 
-raid-aura-timers.lua
+aura-timers.lua
