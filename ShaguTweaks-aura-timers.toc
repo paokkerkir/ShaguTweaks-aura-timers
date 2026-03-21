@@ -2,7 +2,7 @@
 ## Title: |cffffcc00Shagu|cffffffffTweaks |cffcccccc[Aura Timers]
 ## Author: paokkerkir
 ## Notes: Show buff and debuff icons with duration timers on target, party, and pet frames. Requires SuperWoW + Nampower.
-## Version: 3.0
+## Version: 3.1
 ## Dependencies: ShaguTweaks
 ## OptionalDeps: ShaguTweaks-extras
 

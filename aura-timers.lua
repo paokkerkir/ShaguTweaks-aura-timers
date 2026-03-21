@@ -237,7 +237,7 @@ local function CreateAuraIcon(parent, iconSize, isDebuff, timerFontSize, timerBe
   icon.cd.noCooldownCount = true
   icon.cd:SetAllPoints()
   icon.cd:SetScale(0.7)
-  icon.cd:SetAlpha(0.8)
+  icon.cd:SetAlpha(0.4)
 
   -- Timer text
   icon.timer = icon:CreateFontString(nil, "OVERLAY")
