@@ -27,9 +27,7 @@ local PARTY_TIMER_FONT = 7
 local MAX_BUFFS = 16
 local MAX_DEBUFFS = 16
 local PARTY_MAX_PER_ROW = 5
-
--- Gold timer color (WoW standard gold)
-local GOLD_R, GOLD_G, GOLD_B = 1.0, 0.82, 0
+local SORT_ORDER = "Duration ascending"  -- "Default", "Duration ascending", "Duration descending"
 
 -- Duration tracking: [targetGuid] = { [spellId] = { start, duration } }
 -- ONLY populated by actual events (UNIT_CASTEVENT / AURA_CAST), never from snapshots
@@ -188,16 +186,24 @@ local function BuildTexToSpellMap(guid)
   return map
 end
 
--- Simple time formatter (no embedded color codes - we use gold FontString color)
 local function FormatTime(remaining)
-  if remaining >= 86400 then
-    return math.floor(remaining / 86400) .. "d"
-  elseif remaining >= 3600 then
-    return math.floor(remaining / 3600) .. "h"
-  elseif remaining >= 60 then
-    return math.floor(remaining / 60) .. "m"
+  local color
+  if remaining < 5 then
+    color = "|cffff5555"
+  elseif remaining < 10 then
+    color = "|cffffd100"
   else
-    return math.floor(remaining) .. ""
+    color = "|cffffffff"
+  end
+
+  if remaining < 60 then
+    return color .. math.ceil(remaining)
+  elseif remaining < 3600 then
+    return color .. math.ceil(remaining / 60) .. "m"
+  elseif remaining < 86400 then
+    return color .. math.ceil(remaining / 3600) .. "h"
+  else
+    return color .. math.ceil(remaining / 86400) .. "d"
   end
 end
 
@@ -242,11 +248,10 @@ local function CreateAuraIcon(parent, iconSize, isDebuff, timerFontSize, timerBe
   -- Timer text
   icon.timer = icon:CreateFontString(nil, "OVERLAY")
   icon.timer:SetFont(STANDARD_TEXT_FONT, timerFontSize, "OUTLINE")
-  icon.timer:SetTextColor(GOLD_R, GOLD_G, GOLD_B)
   if timerBelow then
     icon.timer:SetPoint("TOP", icon, "BOTTOM", 0, -1)
   else
-    icon.timer:SetPoint("BOTTOM", icon, "BOTTOM", 0, 1)
+    icon.timer:SetPoint("CENTER", icon, "CENTER", 0, 0)
   end
   icon.timer:SetJustifyH("CENTER")
   icon.timer:Hide()
@@ -318,6 +323,10 @@ local function UpdateBuffIcons(icons, maxCount, unitstr, guid, texToSpell, isDeb
     -- Duration timer: only from event-tracked data
     local spellId = texToSpell and texToSpell[string.lower(texture)] or nil
     local duration, timeleft = GetTrackedDuration(guid, spellId)
+    if not timeleft and isDebuff and libdebuff then
+      local _, _, _, _, _, dur, tl = libdebuff:UnitDebuff(unitstr, i)
+      if tl and tl > 0 and dur and dur > 0 then duration = dur; timeleft = tl end
+    end
     if duration and timeleft and duration > 0 then
       local start = GetTime() + timeleft - duration
       CooldownFrame_SetTimer(icon.cd, start, duration, 1)
@@ -342,6 +351,29 @@ local function UpdateBuffIcons(icons, maxCount, unitstr, guid, texToSpell, isDeb
   end
 
   return idx
+end
+
+local function BuildSortedOrder(icons, sortOrder)
+  if not sortOrder or sortOrder == "Default" then return nil end
+  local entries = {}
+  for i = 1, table.getn(icons) do
+    if icons[i]:IsShown() then
+      local tl = 99999
+      if icons[i].timerStart and icons[i].timerDuration then
+        tl = (icons[i].timerStart + icons[i].timerDuration) - GetTime()
+        if tl < 0 then tl = 0 end
+      end
+      table.insert(entries, { idx = i, timeLeft = tl })
+    end
+  end
+  if sortOrder == "Duration ascending" then
+    table.sort(entries, function(a, b) return a.timeLeft < b.timeLeft end)
+  elseif sortOrder == "Duration descending" then
+    table.sort(entries, function(a, b) return a.timeLeft > b.timeLeft end)
+  end
+  local order = {}
+  for _, e in ipairs(entries) do table.insert(order, e.idx) end
+  return order
 end
 
 -- ============================================================================
@@ -421,23 +453,31 @@ local function UpdateDisplay(display, maxBuffs, maxDebuffs, unitstr)
   local guid = GetUnitGUID and GetUnitGUID(unitstr) or nil
   local texToSpell = BuildTexToSpellMap(guid)
 
-  -- Update debuffs first, count visible
   local visibleDebuffs = UpdateBuffIcons(display.debuffs, maxDebuffs, unitstr, guid, texToSpell, true)
-
-  -- Position visible debuffs
-  for i = 1, visibleDebuffs do
-    PositionIcon(display.debuffs[i], display, i)
-  end
-
-  -- Position buff icons after visible debuffs
-  for i = 1, maxBuffs do
-    PositionIcon(display.buffs[i], display, visibleDebuffs + i)
-  end
-
-  -- Update buffs
   local visibleBuffs = UpdateBuffIcons(display.buffs, maxBuffs, unitstr, guid, texToSpell, false)
 
-  -- Track whether second row is used
+  local debuffOrder = BuildSortedOrder(display.debuffs, SORT_ORDER)
+  if debuffOrder then
+    for pos, srcIdx in ipairs(debuffOrder) do
+      PositionIcon(display.debuffs[srcIdx], display, pos)
+    end
+  else
+    for i = 1, visibleDebuffs do
+      PositionIcon(display.debuffs[i], display, i)
+    end
+  end
+
+  local buffOrder = BuildSortedOrder(display.buffs, SORT_ORDER)
+  if buffOrder then
+    for pos, srcIdx in ipairs(buffOrder) do
+      PositionIcon(display.buffs[srcIdx], display, visibleDebuffs + pos)
+    end
+  else
+    for i = 1, visibleBuffs do
+      PositionIcon(display.buffs[i], display, visibleDebuffs + i)
+    end
+  end
+
   local totalVisible = visibleDebuffs + visibleBuffs
   local maxPerRow = display.maxPerRow or 999
   display.hasSecondRow = (totalVisible > maxPerRow)
@@ -602,8 +642,10 @@ module.enable = function(self)
     local ev = CreateFrame("Frame")
     ev:RegisterEvent("PLAYER_TARGET_CHANGED")
     ev:RegisterEvent("UNIT_AURA")
+    ev:RegisterEvent("PLAYER_AURAS_CHANGED")
     ev:SetScript("OnEvent", function()
       if event == "UNIT_AURA" and arg1 ~= "target" then return end
+      if event == "PLAYER_AURAS_CHANGED" and not UnitIsUnit("player", "target") then return end
       HideDefaultTargetAuras()
       UpdateDisplay(targetDisplay, MAX_BUFFS, MAX_DEBUFFS, "target")
     end)

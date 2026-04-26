@@ -17,13 +17,13 @@ Registers as a ShaguTweaks module — toggle on/off in ShaguTweaks settings.
 ## How It Works
 
 - Uses `UnitBuff`/`UnitDebuff` to display only visible auras
-- Debuffs shown first, then buffs in a single row
-- **Target**: left to right, timer text below icons (17px icons, 8pt font)
-- **Party/Pet**: right to left, timer text inside icons (14px icons, 7pt font)
+- Debuffs shown first, then buffs; both groups sorted ascending by remaining duration
+- **Target**: left to right, timer text centered inside icons (17px icons, 8pt font)
+- **Party/Pet**: right to left, timer text centered inside icons (14px icons, 7pt font)
 - Party/Pet wraps to a second row after 5 icons; frames below shift down automatically
-- Timer text in gold WoW color for all frames
-- Timers only appear when duration is known from cast events (no guesswork)
-- Duration sources: SuperWoW `UNIT_CASTEVENT` + built-in buff/debuff tables, or Nampower `AURA_CAST` events for exact server durations
+- Timer color changes with time remaining: white (≥10s), gold (5–10s), red (<5s)
+- Debuff timers fall back to ShaguTweaks `libdebuff` when no cast event data is available
+- Duration sources: SuperWoW `UNIT_CASTEVENT` + built-in buff/debuff tables, Nampower `AURA_CAST` events for exact server durations, `libdebuff` for debuffs
 - Cooldown spirals on all icons
 - Hides default Blizzard target buffs/debuffs to prevent duplicates
 
@@ -40,6 +40,7 @@ local PARTY_TIMER_FONT = 7
 local MAX_BUFFS = 16
 local MAX_DEBUFFS = 16
 local PARTY_MAX_PER_ROW = 5
+local SORT_ORDER = "Duration ascending"  -- "Default", "Duration ascending", "Duration descending"
 ```
 
 To add missing buff durations, add entries to the `buffDurations` table:
@@ -48,7 +49,7 @@ To add missing buff durations, add entries to the `buffDurations` table:
 ["Your Buff Name"] = 300, -- duration in seconds
 ```
 
-Debuff durations are handled automatically by ShaguTweaks' `libdebuff`.
+Debuff durations are provided by ShaguTweaks' `libdebuff` (cast-event tracking and fallback lookup).
 
 ## Compatibility
 
