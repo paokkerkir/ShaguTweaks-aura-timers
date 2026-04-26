@@ -1,6 +1,6 @@
 # ShaguTweaks [Aura Timers]
 
-Companion addon for [ShaguTweaks](https://github.com/shagu/ShaguTweaks) that shows buff/debuff icons with duration timers on target, party, and pet frames. Vanilla WoW 1.12 client.
+Companion addon for [ShaguTweaks](https://github.com/paokkerkir/ShaguTweaks) that shows buff/debuff icons with duration timers on target, party, and pet frames. Vanilla WoW 1.12 client.
 
 ## Requirements
 
