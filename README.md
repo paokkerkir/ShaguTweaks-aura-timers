@@ -10,7 +10,7 @@ Companion addon for [ShaguTweaks](https://github.com/shagu/ShaguTweaks) that sho
 
 ## Installation
 
-Copy `ShaguTweaks-aura-timers/` into `Interface/AddOns/` and `/reload`.
+Copy `ShaguTweaks-aura-timers/` into `Interface/AddOns/` and restart WoW.
 
 Registers as a ShaguTweaks module — toggle on/off in ShaguTweaks settings.
 
