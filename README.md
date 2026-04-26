@@ -29,7 +29,7 @@ Registers as a ShaguTweaks module — toggle on/off in ShaguTweaks settings.
 
 ## Configuration
 
-Edit constants at the top of `aura-timers.lua`:
+Edit constants at the top of `aura-timers.lua` and /reload:
 
 ```lua
 local TARGET_ICON_SIZE = 17
