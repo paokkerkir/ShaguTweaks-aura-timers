@@ -53,7 +53,7 @@ Debuff durations are provided by ShaguTweaks' `libdebuff` (cast-event tracking a
 
 ## Compatibility
 
-Default offsets tuned for DragonflightReloaded UI. Works with any UI that keeps standard frame names (`TargetFrame`, `PartyMemberFrame1-4`, `PetFrame`).
+Default offsets tuned for BlizzardUI and ShaguTweaks edits. Works with any UI that keeps standard frame names (`TargetFrame`, `PartyMemberFrame1-4`, `PetFrame`).
 
 ## License
 
